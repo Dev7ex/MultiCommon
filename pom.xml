@@ -16,6 +16,7 @@
     <modules>
         <module>multicommon-api</module>
         <module>multicommon-paper</module>
+        <module>multicommon-resources</module>
     </modules>
 
     <properties>
