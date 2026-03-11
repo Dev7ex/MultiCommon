@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/Dev7ex/MultiCommon">
-    <img src="multicommon-resources/src/main/resources/image/title-description.png" alt="MultiCommon" width="420">
+    <img src="multicommon-resources/src/main/resources/image/title-description.png" alt="MultiCommon" width="400">
   </a>
 </p>
 
