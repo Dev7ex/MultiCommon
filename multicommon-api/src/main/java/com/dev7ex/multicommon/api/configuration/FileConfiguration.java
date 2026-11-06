@@ -1,4 +1,4 @@
-package com.dev7ex.multicommon.api.io.file.configuration;
+package com.dev7ex.multicommon.api.configuration;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;

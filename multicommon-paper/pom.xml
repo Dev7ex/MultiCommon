@@ -36,7 +36,7 @@
 
         <dependency>
             <groupId>com.dev7ex</groupId>
-            <artifactId>multicommon-api-paper</artifactId>
+            <artifactId>multicommon-api</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

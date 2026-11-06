@@ -1,4 +1,4 @@
-package com.dev7ex.multicommon.api.io.file.configuration;
+package com.dev7ex.multicommon.api.configuration;
 
 import java.io.*;
 import java.util.HashMap;

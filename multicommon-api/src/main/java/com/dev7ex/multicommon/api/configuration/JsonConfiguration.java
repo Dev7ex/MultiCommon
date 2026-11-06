@@ -1,4 +1,4 @@
-package com.dev7ex.multicommon.api.io.file.configuration;
+package com.dev7ex.multicommon.api.configuration;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

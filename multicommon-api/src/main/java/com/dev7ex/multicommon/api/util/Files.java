@@ -1,4 +1,4 @@
-package com.dev7ex.multicommon.api.io.file;
+package com.dev7ex.multicommon.api.util;
 
 import java.io.File;
 import java.util.Arrays;
