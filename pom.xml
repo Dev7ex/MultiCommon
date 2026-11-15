@@ -48,7 +48,7 @@
         <dependency.lombok.version>1.18.38</dependency.lombok.version> <!-- No change, released in August 2024 -->
         <dependency.maven.artifact.version>3.6.0</dependency.maven.artifact.version> <!-- No change, released in January 2024 -->
         <dependency.mongodb.version>4.5.0</dependency.mongodb.version> <!-- Latest version, released in April 2025 -->
-        <dependency.mysql.version>8.0.34</dependency.mysql.version> <!-- Latest version, released in March 2025 -->
+        <dependency.mysql.version>8.0.33</dependency.mysql.version> <!-- Latest version, released in March 2025 -->
         <dependency.paper.api.version>1.21.4-R0.1-SNAPSHOT</dependency.paper.api.version> <!-- Updated to 1.21.4, released on December 15, 2024 -->
         <dependency.placeholderapi.version>2.11.0</dependency.placeholderapi.version> <!-- Latest version, released in March 2025 -->
         <dependency.protocollib.version>5.2.0</dependency.protocollib.version> <!-- Latest version, released in April 2025 -->

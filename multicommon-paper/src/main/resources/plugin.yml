@@ -1,0 +1,14 @@
+name: MultiCommon
+version: '${project.version}'
+description: '${project.description}'
+main: com.dev7ex.multicommon.MultiCommonPlugin
+api-version: '1.16'
+
+author: Dev7ex
+website: '${project.url}'
+prefix: MultiCommon
+
+load: POSTWORLD
+
+softdepend:
+  - ProtocolLib

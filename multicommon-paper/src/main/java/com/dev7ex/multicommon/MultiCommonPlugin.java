@@ -1,5 +1,6 @@
 package com.dev7ex.multicommon;
 
+import com.dev7ex.multicommon.api.plugin.AdvancedPlugin;
 import lombok.AccessLevel;
 import lombok.Getter;
 
@@ -8,5 +9,5 @@ import lombok.Getter;
  * @since 24.05.2025
  */
 @Getter(AccessLevel.PUBLIC)
-public class MultiCommonPlugin {
+public class MultiCommonPlugin extends AdvancedPlugin {
 }

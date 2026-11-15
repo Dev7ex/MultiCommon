@@ -4,10 +4,10 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.snakeyaml.engine.v2.api.Load;
-import org.snakeyaml.engine.v2.api.LoadSettings;
 import org.snakeyaml.engine.v2.api.Dump;
 import org.snakeyaml.engine.v2.api.DumpSettings;
+import org.snakeyaml.engine.v2.api.Load;
+import org.snakeyaml.engine.v2.api.LoadSettings;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -177,12 +177,6 @@ public final class YamlConfiguration extends ConfigurationProvider {
         return new FileConfiguration(this.castToMap(data), defaults);
     }
 
-    /**
-     * Casts the provided data to a {@link Map<String, Object>}. If the data is not an instance of Map, returns an empty map.
-     *
-     * @param data The data to cast.
-     * @return The casted map, or an empty map if the data is not a Map.
-     */
     @SuppressWarnings("unchecked")
     private @NotNull Map<String, Object> castToMap(@Nullable final Object data) {
         if (data instanceof Map) {
