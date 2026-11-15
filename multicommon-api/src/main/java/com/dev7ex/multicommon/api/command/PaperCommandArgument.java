@@ -1,4 +1,4 @@
-package com.dev7ex.multicommon.api.bukkit.command;
+package com.dev7ex.multicommon.api.command;
 
 import org.jetbrains.annotations.NotNull;
 
