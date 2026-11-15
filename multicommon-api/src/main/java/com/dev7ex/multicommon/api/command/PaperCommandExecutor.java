@@ -1,6 +1,5 @@
 package com.dev7ex.multicommon.api.command;
 
-import com.dev7ex.multicommon.api.bukkit.command.PaperCommandArgument;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

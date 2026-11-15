@@ -1,7 +1,6 @@
 
 package com.dev7ex.multicommon.api.command;
 
-import com.dev7ex.multicommon.api.bukkit.command.PaperCommandArgument;
 import com.dev7ex.multicommon.api.plugin.AdvancedPlugin;
 import com.dev7ex.multicommon.api.plugin.ConfigurablePlugin;
 import com.dev7ex.multicommon.api.plugin.configuration.PluginConfiguration;

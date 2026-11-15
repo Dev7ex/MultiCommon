@@ -1,7 +1,7 @@
 
 package com.dev7ex.multicommon.api.command.completer;
 
-import com.dev7ex.multicommon.api.bukkit.command.PaperCommandArgument;
+import com.dev7ex.multicommon.api.command.PaperCommandArgument;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
