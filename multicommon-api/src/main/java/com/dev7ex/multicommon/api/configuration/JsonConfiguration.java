@@ -3,6 +3,7 @@ package com.dev7ex.multicommon.api.configuration;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSerializer;
+import com.google.gson.ToNumberPolicy;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -30,6 +31,7 @@ public class JsonConfiguration extends ConfigurationProvider {
     private final Gson json = new GsonBuilder()
             .serializeNulls()
             .setPrettyPrinting()
+            .setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE)
             .registerTypeAdapter(FileConfiguration.class, (JsonSerializer<FileConfiguration>) (configuration, type, context)
                     -> context.serialize(configuration.self)).create();
 

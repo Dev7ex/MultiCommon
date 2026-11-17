@@ -11,7 +11,9 @@ import org.snakeyaml.engine.v2.api.LoadSettings;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -70,7 +72,7 @@ public final class YamlConfiguration extends ConfigurationProvider {
      */
     @Override
     public void save(@NotNull final FileConfiguration config, @NotNull final Writer writer) {
-        final String output = this.dump.get().dumpToString(config.self);
+        final String output = this.dump.get().dumpToString(this.toPlainMap(config.self));
         try {
             writer.write(output);
         } catch (final IOException e) {
@@ -179,10 +181,39 @@ public final class YamlConfiguration extends ConfigurationProvider {
 
     @SuppressWarnings("unchecked")
     private @NotNull Map<String, Object> castToMap(@Nullable final Object data) {
-        if (data instanceof Map) {
-            return (Map<String, Object>) data;
+        if (data == null) {
+            return new LinkedHashMap<>();
         }
-        return new LinkedHashMap<>();
+
+        if (!(data instanceof Map)) {
+            throw new IllegalArgumentException(String.format("Invalid YAML root: expected a mapping but got %s", data.getClass().getSimpleName()));
+        }
+        return (Map<String, Object>) data;
+    }
+
+    private @NotNull Map<String, Object> toPlainMap(@NotNull final Map<String, Object> map) {
+        final Map<String, Object> plainMap = new LinkedHashMap<>();
+
+        for (final Map.Entry<String, Object> entry : map.entrySet()) {
+            plainMap.put(entry.getKey(), this.toPlainValue(entry.getValue()));
+        }
+        return plainMap;
+    }
+
+    private @Nullable Object toPlainValue(@Nullable final Object value) {
+        if (value instanceof FileConfiguration) {
+            return this.toPlainMap(((FileConfiguration) value).self);
+        }
+
+        if (value instanceof List) {
+            final List<Object> plainList = new ArrayList<>();
+
+            for (final Object element : (List<?>) value) {
+                plainList.add(this.toPlainValue(element));
+            }
+            return plainList;
+        }
+        return value;
     }
 
 }

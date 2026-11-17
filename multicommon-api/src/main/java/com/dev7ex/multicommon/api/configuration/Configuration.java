@@ -6,8 +6,11 @@ import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 /**
  * A utility class to manage file-based configurations.
@@ -62,7 +65,17 @@ public class Configuration implements ConfigurationBase {
             return;
         }
         try (final InputStream inputStream = this.configurationHolder.getClass().getClassLoader().getResourceAsStream(this.getFileName())) {
-            Files.copy(inputStream, this.configurationFile.toPath());
+            if (inputStream == null) {
+                throw new IllegalStateException(String.format("Resource not found: %s", this.getFileName()));
+            }
+            final File temporaryFile = this.getTemporaryFile();
+
+            try {
+                Files.copy(inputStream, temporaryFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                this.moveFile(temporaryFile);
+            } finally {
+                Files.deleteIfExists(temporaryFile.toPath());
+            }
         }
     }
 
@@ -72,7 +85,11 @@ public class Configuration implements ConfigurationBase {
     @Override
     @SneakyThrows
     public void loadFile() {
-        this.fileConfiguration = ConfigurationProvider.getProvider(this.getProvider()).load(this.configurationFile);
+        try {
+            this.fileConfiguration = ConfigurationProvider.getProvider(this.getProvider()).load(this.configurationFile);
+        } catch (final RuntimeException exception) {
+            throw new IllegalStateException(String.format("Can't load File %s: %s", this.configurationFile.getName(), exception.getMessage()), exception);
+        }
     }
 
     /**
@@ -80,8 +97,15 @@ public class Configuration implements ConfigurationBase {
      */
     @Override
     @SneakyThrows
-    public void saveFile() {
-        ConfigurationProvider.getProvider(this.getProvider()).save(this.fileConfiguration, this.configurationFile);
+    public synchronized void saveFile() {
+        final File temporaryFile = this.getTemporaryFile();
+
+        try {
+            ConfigurationProvider.getProvider(this.getProvider()).save(this.fileConfiguration, temporaryFile);
+            this.moveFile(temporaryFile);
+        } finally {
+            Files.deleteIfExists(temporaryFile.toPath());
+        }
     }
 
     /**
@@ -102,6 +126,18 @@ public class Configuration implements ConfigurationBase {
     @Override
     public final Class<? extends ConfigurationProvider> getProvider() {
         return this.getClass().getAnnotation(ConfigurationProperties.class).provider();
+    }
+
+    private @NotNull File getTemporaryFile() {
+        return new File(this.configurationFile.getParentFile(), this.configurationFile.getName() + ".tmp");
+    }
+
+    private void moveFile(@NotNull final File temporaryFile) throws IOException {
+        try {
+            Files.move(temporaryFile.toPath(), this.configurationFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        } catch (final AtomicMoveNotSupportedException exception) {
+            Files.move(temporaryFile.toPath(), this.configurationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
     }
 
     @Override
