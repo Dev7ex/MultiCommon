@@ -2,8 +2,10 @@ package com.dev7ex.multicommon.api.bukkit.command;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Locale;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * A utility class for parsing and converting a single command argument
@@ -55,11 +57,7 @@ public class PaperCommandArgument implements Cloneable, Comparable<PaperCommandA
      * @param exceptionConsumer  consumer for any thrown exception
      */
     public void asByte(@NotNull final Consumer<Byte> byteConsumer, @NotNull final Consumer<Exception> exceptionConsumer) {
-        try {
-            byteConsumer.accept(Byte.parseByte(this.argument));
-        } catch (final Exception exception) {
-            exceptionConsumer.accept(exception);
-        }
+        this.parse(() -> Byte.parseByte(this.argument), byteConsumer, exceptionConsumer);
     }
 
     /**
@@ -78,11 +76,7 @@ public class PaperCommandArgument implements Cloneable, Comparable<PaperCommandA
      * @param exceptionConsumer  consumer for any thrown exception
      */
     public void asShort(@NotNull final Consumer<Short> shortConsumer, @NotNull final Consumer<Exception> exceptionConsumer) {
-        try {
-            shortConsumer.accept(Short.parseShort(this.argument));
-        } catch (final Exception exception) {
-            exceptionConsumer.accept(exception);
-        }
+        this.parse(() -> Short.parseShort(this.argument), shortConsumer, exceptionConsumer);
     }
 
     /**
@@ -101,11 +95,7 @@ public class PaperCommandArgument implements Cloneable, Comparable<PaperCommandA
      * @param exceptionConsumer  consumer for any thrown exception
      */
     public void asInteger(@NotNull final Consumer<Integer> intConsumer, @NotNull final Consumer<Exception> exceptionConsumer) {
-        try {
-            intConsumer.accept(Integer.parseInt(this.argument));
-        } catch (final Exception exception) {
-            exceptionConsumer.accept(exception);
-        }
+        this.parse(() -> Integer.parseInt(this.argument), intConsumer, exceptionConsumer);
     }
 
     /**
@@ -124,11 +114,7 @@ public class PaperCommandArgument implements Cloneable, Comparable<PaperCommandA
      * @param exceptionConsumer  consumer for any thrown exception
      */
     public void asLong(@NotNull final Consumer<Long> longConsumer, @NotNull final Consumer<Exception> exceptionConsumer) {
-        try {
-            longConsumer.accept(Long.parseLong(this.argument));
-        } catch (final Exception exception) {
-            exceptionConsumer.accept(exception);
-        }
+        this.parse(() -> Long.parseLong(this.argument), longConsumer, exceptionConsumer);
     }
 
     /**
@@ -147,11 +133,7 @@ public class PaperCommandArgument implements Cloneable, Comparable<PaperCommandA
      * @param exceptionConsumer  consumer for any thrown exception
      */
     public void asFloat(@NotNull final Consumer<Float> floatConsumer, @NotNull final Consumer<Exception> exceptionConsumer) {
-        try {
-            floatConsumer.accept(Float.parseFloat(this.argument));
-        } catch (final Exception exception) {
-            exceptionConsumer.accept(exception);
-        }
+        this.parse(() -> Float.parseFloat(this.argument), floatConsumer, exceptionConsumer);
     }
 
     /**
@@ -170,11 +152,7 @@ public class PaperCommandArgument implements Cloneable, Comparable<PaperCommandA
      * @param exceptionConsumer  consumer for any thrown exception
      */
     public void asDouble(@NotNull final Consumer<Double> doubleConsumer, @NotNull final Consumer<Exception> exceptionConsumer) {
-        try {
-            doubleConsumer.accept(Double.parseDouble(this.argument));
-        } catch (final Exception exception) {
-            exceptionConsumer.accept(exception);
-        }
+        this.parse(() -> Double.parseDouble(this.argument), doubleConsumer, exceptionConsumer);
     }
 
     /**
@@ -193,15 +171,12 @@ public class PaperCommandArgument implements Cloneable, Comparable<PaperCommandA
      * @param exceptionConsumer  consumer for any thrown exception
      */
     public void asBoolean(@NotNull final Consumer<Boolean> booleanConsumer, @NotNull final Consumer<Exception> exceptionConsumer) {
-        try {
+        this.parse(() -> {
             if ("true".equalsIgnoreCase(this.argument) || "false".equalsIgnoreCase(this.argument)) {
-                booleanConsumer.accept(Boolean.parseBoolean(this.argument));
-            } else {
-                throw new IllegalArgumentException("Invalid boolean value: " + this.argument);
+                return Boolean.parseBoolean(this.argument);
             }
-        } catch (final Exception exception) {
-            exceptionConsumer.accept(exception);
-        }
+            throw new IllegalArgumentException("Invalid boolean value: " + this.argument);
+        }, booleanConsumer, exceptionConsumer);
     }
 
     /**
@@ -221,7 +196,7 @@ public class PaperCommandArgument implements Cloneable, Comparable<PaperCommandA
      * @return the parsed enum constant
      */
     public <T extends Enum<T>> T asEnum(@NotNull final Class<T> enumClass) {
-        return Enum.valueOf(enumClass, this.argument.toUpperCase());
+        return Enum.valueOf(enumClass, this.argument.toUpperCase(Locale.ROOT));
     }
 
     /**
@@ -236,11 +211,7 @@ public class PaperCommandArgument implements Cloneable, Comparable<PaperCommandA
             @NotNull final Class<T> enumClass,
             @NotNull final Consumer<T> enumConsumer,
             @NotNull final Consumer<Exception> exceptionConsumer) {
-        try {
-            enumConsumer.accept(Enum.valueOf(enumClass, this.argument.toUpperCase()));
-        } catch (final Exception exception) {
-            exceptionConsumer.accept(exception);
-        }
+        this.parse(() -> Enum.valueOf(enumClass, this.argument.toUpperCase(Locale.ROOT)), enumConsumer, exceptionConsumer);
     }
 
     /**
@@ -260,11 +231,7 @@ public class PaperCommandArgument implements Cloneable, Comparable<PaperCommandA
      * @param exceptionConsumer  consumer for any thrown exception
      */
     public void asUniqueId(@NotNull final Consumer<UUID> uuidConsumer, @NotNull final Consumer<Exception> exceptionConsumer) {
-        try {
-            uuidConsumer.accept(UUID.fromString(this.argument));
-        } catch (final Exception exception) {
-            exceptionConsumer.accept(exception);
-        }
+        this.parse(() -> UUID.fromString(this.argument), uuidConsumer, exceptionConsumer);
     }
 
     /**
@@ -304,6 +271,18 @@ public class PaperCommandArgument implements Cloneable, Comparable<PaperCommandA
     @Override
     public int compareTo(@NotNull final PaperCommandArgument other) {
         return this.argument.compareToIgnoreCase(other.argument);
+    }
+
+    private <T> void parse(@NotNull final Supplier<T> parser, @NotNull final Consumer<T> consumer, @NotNull final Consumer<Exception> exceptionConsumer) {
+        final T value;
+
+        try {
+            value = parser.get();
+        } catch (final IllegalArgumentException exception) {
+            exceptionConsumer.accept(exception);
+            return;
+        }
+        consumer.accept(value);
     }
 
 }
