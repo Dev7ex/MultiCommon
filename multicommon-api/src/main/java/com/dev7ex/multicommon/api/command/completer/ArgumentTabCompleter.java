@@ -10,6 +10,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Stream;
 
 /**
  * @author Dev7ex
@@ -28,5 +30,12 @@ public interface ArgumentTabCompleter extends TabCompleter {
 
     @Nullable
     List<String> onTabComplete(@NotNull final CommandSender commandSender, @NotNull final PaperCommandArgument[] arguments);
+
+    static @NotNull List<String> filterByLastArgument(@NotNull final Stream<String> completions, @NotNull final PaperCommandArgument[] arguments) {
+        final String prefix = (arguments.length == 0) ? "" : arguments[arguments.length - 1].asString().toLowerCase(Locale.ROOT);
+
+        return completions.filter(completion -> completion.toLowerCase(Locale.ROOT).startsWith(prefix))
+                .toList();
+    }
 
 }

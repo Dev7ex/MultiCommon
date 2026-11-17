@@ -14,11 +14,14 @@ import java.util.List;
  */
 public interface EntityTabCompleter extends ArgumentTabCompleter {
 
+    List<String> ENTITY_NAMES = Arrays.stream(EntityType.values())
+            .filter(entityType -> entityType != EntityType.UNKNOWN)
+            .map(EntityType::name)
+            .toList();
+
     @Override
     default List<String> onTabComplete(final @NotNull CommandSender commandSender, @NotNull final PaperCommandArgument[] arguments) {
-        return Arrays.stream(EntityType.values())
-                .map(EntityType::name)
-                .toList();
+        return ArgumentTabCompleter.filterByLastArgument(EntityTabCompleter.ENTITY_NAMES.stream(), arguments);
     }
 
 }

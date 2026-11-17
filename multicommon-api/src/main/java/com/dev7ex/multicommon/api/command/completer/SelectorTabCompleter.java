@@ -17,12 +17,12 @@ public interface SelectorTabCompleter extends ArgumentTabCompleter {
 
     @Override
     default List<String> onTabComplete(final @NotNull CommandSender commandSender, final @NotNull PaperCommandArgument[] arguments) {
-        return Stream.concat(
-                        Stream.of("@a", "@p", "@r", "@s", "@e"),
-                        Bukkit.getOnlinePlayers()
-                                .stream()
-                                .map(Player::getName))
-                .toList();
+        return ArgumentTabCompleter.filterByLastArgument(Stream.concat(
+                Stream.of("@a", "@p", "@r", "@s", "@e"),
+                Bukkit.getOnlinePlayers()
+                        .stream()
+                        .filter(player -> !(commandSender instanceof final Player viewer) || viewer.canSee(player))
+                        .map(Player::getName)), arguments);
     }
 
 }
