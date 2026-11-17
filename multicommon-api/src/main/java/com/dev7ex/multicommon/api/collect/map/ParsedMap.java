@@ -27,11 +27,13 @@ public class ParsedMap<K, V> extends HashMap<K, V> {
     }
 
     public String getString(final K key) {
-        return super.get(key).toString();
+        final V value = super.get(key);
+        return (value == null) ? null : value.toString();
     }
 
     public String getString(final K key, final String defaultValue) {
-        return ((super.get(key).toString() == null) ? (defaultValue) : (super.get(key).toString()));
+        final String value = this.getString(key);
+        return (value == null) ? defaultValue : value;
     }
 
     public byte getByte(final K key) {
@@ -104,7 +106,7 @@ public class ParsedMap<K, V> extends HashMap<K, V> {
 
     public List<?> getList(final K key) {
         final Object searchedObject = this.get(key);
-        return (searchedObject instanceof List ? (List<?>) searchedObject : null);
+        return (searchedObject instanceof List ? (List<?>) searchedObject : Collections.emptyList());
     }
 
     public List<String> getStringList(final K key) {
@@ -244,7 +246,7 @@ public class ParsedMap<K, V> extends HashMap<K, V> {
 
     public Map<?, ?> getMap(final K key) {
         final Object searchedObject = this.get(key);
-        return (searchedObject instanceof Map ? (Map<?, ?>) searchedObject : null);
+        return (searchedObject instanceof Map ? (Map<?, ?>) searchedObject : Collections.emptyMap());
     }
 
     public Map<?, String> getStringMap(final K key) {

@@ -1,5 +1,6 @@
 package com.dev7ex.multicommon.api.module;
 
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 /**
@@ -13,7 +14,7 @@ public interface Module {
     void onDisable();
 
     default UUID getUniqueId() {
-        return UUID.randomUUID();
+        return UUID.nameUUIDFromBytes(this.getClass().getName().getBytes(StandardCharsets.UTF_8));
     }
 
     default String getModuleName() {

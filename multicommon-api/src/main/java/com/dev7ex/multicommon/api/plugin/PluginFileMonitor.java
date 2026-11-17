@@ -59,14 +59,26 @@ public class PluginFileMonitor {
     /**
      * Starts monitoring the plugin's data folder for file changes.
      */
-    public void start() {
+    public synchronized void start() {
+        if (this.alterationMonitor != null) {
+            this.plugin.getLogger().warning("Tried to start file monitoring, but it is already running");
+            return;
+        }
         final File dataFolder = this.plugin.getDataFolder();
-        this.alterationObserver = new FileAlterationObserver(dataFolder);
-        this.alterationObserver.addListener(this.alterationListener);
-        this.alterationMonitor = new FileAlterationMonitor(this.interval, this.alterationObserver);
+        final FileAlterationObserver alterationObserver = new FileAlterationObserver(dataFolder);
+        alterationObserver.addListener(this.alterationListener);
+
+        final FileAlterationMonitor alterationMonitor = new FileAlterationMonitor(this.interval, alterationObserver);
+        alterationMonitor.setThreadFactory(runnable -> {
+            final Thread thread = new Thread(runnable, this.plugin.getName() + "-FileMonitor");
+            thread.setDaemon(true);
+            return thread;
+        });
 
         try {
-            this.alterationMonitor.start();
+            alterationMonitor.start();
+            this.alterationObserver = alterationObserver;
+            this.alterationMonitor = alterationMonitor;
             this.plugin.getLogger().info("File monitoring started (interval: " + interval + "ms) at: " + dataFolder.getAbsolutePath());
 
         } catch (final Exception exception) {
@@ -77,18 +89,21 @@ public class PluginFileMonitor {
     /**
      * Stops monitoring file changes.
      */
-    public void stop() {
+    public synchronized void stop() {
         if (this.alterationMonitor == null) {
             this.plugin.getLogger().warning("Tried to stop file monitoring, but it was never started");
             return;
         }
 
         try {
-            this.alterationMonitor.stop();
+            this.alterationMonitor.stop(1000L);
             this.plugin.getLogger().info("File monitoring stopped");
         } catch (final Exception exception) {
 
             this.plugin.getLogger().severe("Failed to stop file monitoring: " + exception.getMessage());
+        } finally {
+            this.alterationMonitor = null;
+            this.alterationObserver = null;
         }
     }
 

@@ -35,20 +35,22 @@ public class FileConfiguration {
         }
     }
 
-    private FileConfiguration getSectionFor(final String path) {
+    @Nullable
+    private FileConfiguration getSectionFor(@NotNull final String path, final boolean create) {
         final int index = path.indexOf(SEPARATOR);
         if (index == -1) {
             return this;
         }
 
         final String root = path.substring(0, index);
-        Object section = this.self.get(root);
-        if (section == null) {
-            section = new FileConfiguration((this.defaults == null) ? null : this.defaults.getSection(root));
-            this.self.put(root, section);
-        }
+        final Object section = this.self.get(root);
 
-        return (FileConfiguration) section;
+        if ((section != null) || (!create)) {
+            return (FileConfiguration) section;
+        }
+        final FileConfiguration createdSection = new FileConfiguration((this.defaults == null) ? null : this.defaults.getSection(root));
+        this.self.put(root, createdSection);
+        return createdSection;
     }
 
     public void addDefault(@NotNull final String path, @NotNull final Object value) {
@@ -79,7 +81,10 @@ public class FileConfiguration {
     /*------------------------------------------------------------------------*/
     @SuppressWarnings("unchecked")
     public <T> T get(final String path, final T def) {
-        final FileConfiguration section = this.getSectionFor(path);
+        final FileConfiguration section = this.getSectionFor(path, def instanceof FileConfiguration);
+        if (section == null) {
+            return def;
+        }
         final Object val;
         if (section == this) {
             val = this.self.get(path);
@@ -87,7 +92,7 @@ public class FileConfiguration {
             val = section.get(this.getChild(path), def);
         }
 
-        if (val == null && def instanceof FileConfiguration) {
+        if (val == null && section == this && def instanceof FileConfiguration) {
             this.self.put(path, def);
         }
 
@@ -111,7 +116,10 @@ public class FileConfiguration {
             value = new FileConfiguration((Map) value, (this.defaults == null) ? null : this.defaults.getSection(path));
         }
 
-        final FileConfiguration section = this.getSectionFor(path);
+        final FileConfiguration section = this.getSectionFor(path, value != null);
+        if (section == null) {
+            return;
+        }
         if (section == this) {
             if (value == null) {
                 this.self.remove(path);

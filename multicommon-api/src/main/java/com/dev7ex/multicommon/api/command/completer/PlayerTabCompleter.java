@@ -4,6 +4,7 @@ import com.dev7ex.multicommon.api.command.PaperCommandArgument;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -16,10 +17,10 @@ public interface PlayerTabCompleter extends ArgumentTabCompleter {
 
     @Override
     default List<String> onTabComplete(final @NotNull CommandSender commandSender, @NotNull final PaperCommandArgument[] arguments) {
-        return Bukkit.getOnlinePlayers()
+        return ArgumentTabCompleter.filterByLastArgument(Bukkit.getOnlinePlayers()
                 .stream()
-                .map(HumanEntity::getName)
-                .toList();
+                .filter(player -> !(commandSender instanceof final Player viewer) || viewer.canSee(player))
+                .map(HumanEntity::getName), arguments);
     }
 
 }

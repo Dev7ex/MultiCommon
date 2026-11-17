@@ -26,4 +26,11 @@ public class Booleans {
                 .anyMatch(b -> b.equalsIgnoreCase(value));
     }
 
+    public static boolean parseBoolean(@NotNull final String value) {
+        if (!Booleans.isBoolean(value)) {
+            throw new IllegalArgumentException(String.format("Invalid boolean value: %s", value));
+        }
+        return value.equalsIgnoreCase("true") || value.equals("1");
+    }
+
 }

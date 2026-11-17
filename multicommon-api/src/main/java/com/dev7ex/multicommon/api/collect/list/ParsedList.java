@@ -45,7 +45,8 @@ public class ParsedList<E> extends ArrayList<E> {
      * @throws IndexOutOfBoundsException if the index is out of range
      */
     public String getString(final int index) {
-        return super.get(index).toString();
+        final Object value = super.get(index);
+        return (value == null) ? null : value.toString();
     }
 
     /**
@@ -58,7 +59,7 @@ public class ParsedList<E> extends ArrayList<E> {
      * @throws IndexOutOfBoundsException if the index is out of range
      */
     public String getString(final int index, @NotNull final String defaultValue) {
-        final String value = super.get(index).toString();
+        final String value = this.getString(index);
         return (value == null) ? defaultValue : value;
     }
 

@@ -14,11 +14,14 @@ import java.util.List;
  */
 public interface MaterialTabCompleter extends ArgumentTabCompleter {
 
+    List<String> MATERIAL_NAMES = Arrays.stream(Material.values())
+            .filter(material -> !material.isLegacy())
+            .map(Enum::name)
+            .toList();
+
     @Override
     default List<String> onTabComplete(final @NotNull CommandSender commandSender, @NotNull final PaperCommandArgument[] arguments) {
-        return Arrays.stream(Material.values())
-                .map(Enum::name)
-                .toList();
+        return ArgumentTabCompleter.filterByLastArgument(MaterialTabCompleter.MATERIAL_NAMES.stream(), arguments);
     }
 
 }
