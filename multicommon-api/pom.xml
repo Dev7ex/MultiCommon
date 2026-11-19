@@ -128,7 +128,7 @@
                             <relocations>
                                 <relocation>
                                     <pattern>net.wesjd.anvilgui</pattern>
-                                    <shadedPattern>com.dev7ex.multicommon.api.bukkit.inventory.anvil</shadedPattern>
+                                    <shadedPattern>com.dev7ex.multicommon.api.inventory.anvil</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>org.bstats</pattern>
