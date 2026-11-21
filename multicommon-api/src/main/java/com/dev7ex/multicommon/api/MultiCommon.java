@@ -65,6 +65,16 @@ public class MultiCommon {
         }
     }
 
+    public static boolean isMiniMessageAvailable() {
+        try {
+            Class.forName("net.kyori.adventure.text.minimessage.MiniMessage");
+            return true;
+
+        } catch (final ClassNotFoundException exception) {
+            return false;
+        }
+    }
+
     public static boolean isSpigot() {
         try {
             Class.forName("org.spigotmc.event.player.PlayerSpawnLocationEvent");

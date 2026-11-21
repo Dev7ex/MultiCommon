@@ -25,7 +25,7 @@
         <maven.compiler.target>${project.source.version}</maven.compiler.target>
 
         <project.source.encoding>UTF-8</project.source.encoding>
-        <project.source.version>21</project.source.version> <!-- LTS version, released in September 2021 -->
+        <project.source.version>17</project.source.version> <!-- LTS version, released in September 2021 -->
 
         <maven.jar.plugin.version>3.4.2</maven.jar.plugin.version>
         <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
