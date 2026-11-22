@@ -9,6 +9,7 @@ website: '${project.url}'
 prefix: MultiCommon
 
 load: POSTWORLD
+folia-supported: true
 
 softdepend:
   - ProtocolLib
