@@ -2,14 +2,19 @@ package com.dev7ex.multicommon.api.configuration;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.JsonSerializer;
-import com.google.gson.ToNumberPolicy;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,7 +36,6 @@ public class JsonConfiguration extends ConfigurationProvider {
     private final Gson json = new GsonBuilder()
             .serializeNulls()
             .setPrettyPrinting()
-            .setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE)
             .registerTypeAdapter(FileConfiguration.class, (JsonSerializer<FileConfiguration>) (configuration, type, context)
                     -> context.serialize(configuration.self)).create();
 
@@ -106,13 +110,8 @@ public class JsonConfiguration extends ConfigurationProvider {
      * @return The loaded {@link FileConfiguration}.
      */
     @Override
-    @SuppressWarnings("unchecked")
     public FileConfiguration load(final Reader reader, final FileConfiguration defaults) {
-        Map<String, Object> map = this.json.fromJson(reader, LinkedHashMap.class);
-        if (map == null) {
-            map = new LinkedHashMap<>();
-        }
-        return new FileConfiguration(map, defaults);
+        return new FileConfiguration(this.toMap(this.json.fromJson(reader, JsonElement.class)), defaults);
     }
 
     /**
@@ -157,13 +156,68 @@ public class JsonConfiguration extends ConfigurationProvider {
      * @return The loaded {@link FileConfiguration}.
      */
     @Override
-    @SuppressWarnings("unchecked")
     public FileConfiguration load(final String string, final FileConfiguration defaults) {
-        Map<String, Object> map = this.json.fromJson(string, LinkedHashMap.class);
-        if (map == null) {
-            map = new LinkedHashMap<>();
+        return new FileConfiguration(this.toMap(this.json.fromJson(string, JsonElement.class)), defaults);
+    }
+
+    private Map<String, Object> toMap(final JsonElement element) {
+        final Map<String, Object> map = new LinkedHashMap<>();
+
+        if ((element == null) || (element.isJsonNull())) {
+            return map;
         }
-        return new FileConfiguration(map, defaults);
+
+        if (!element.isJsonObject()) {
+            throw new JsonSyntaxException("The root element must be a JSON object");
+        }
+
+        for (final Map.Entry<String, JsonElement> entry : element.getAsJsonObject().entrySet()) {
+            map.put(entry.getKey(), this.toValue(entry.getValue()));
+        }
+        return map;
+    }
+
+    private Object toValue(final JsonElement element) {
+        if ((element == null) || (element.isJsonNull())) {
+            return null;
+        }
+
+        if (element.isJsonObject()) {
+            return this.toMap(element);
+        }
+
+        if (element.isJsonArray()) {
+            final List<Object> list = new ArrayList<>();
+
+            for (final JsonElement value : element.getAsJsonArray()) {
+                list.add(this.toValue(value));
+            }
+            return list;
+        }
+        final JsonPrimitive primitive = element.getAsJsonPrimitive();
+
+        if (primitive.isBoolean()) {
+            return primitive.getAsBoolean();
+        }
+
+        if (primitive.isNumber()) {
+            return this.toNumber(primitive.getAsString());
+        }
+        return primitive.getAsString();
+    }
+
+    private Number toNumber(final String value) {
+        try {
+            return Long.parseLong(value);
+
+        } catch (final NumberFormatException exception) {
+            final double number = Double.parseDouble(value);
+
+            if (Double.isInfinite(number)) {
+                return new BigDecimal(value);
+            }
+            return number;
+        }
     }
 
 }
