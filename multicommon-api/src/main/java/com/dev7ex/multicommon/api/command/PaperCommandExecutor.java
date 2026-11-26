@@ -1,5 +1,7 @@
 package com.dev7ex.multicommon.api.command;
 
+import com.dev7ex.multicommon.api.MultiCommon;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -12,6 +14,8 @@ import java.util.Arrays;
  * @since 05.12.2024
  */
 public class PaperCommandExecutor implements CommandExecutor {
+
+    private static final boolean FOLIA = MultiCommon.isFolia();
 
     private final PaperCommand paperCommand;
 
@@ -40,9 +44,24 @@ public class PaperCommandExecutor implements CommandExecutor {
         if ((!this.paperCommand.getPermission().isBlank()) && (!commandSender.hasPermission(this.paperCommand.getPermission()))) {
             return true;
         }
-        this.paperCommand.execute(commandSender, Arrays.stream(arguments)
+        final PaperCommandArgument[] commandArguments = Arrays.stream(arguments)
                 .map(PaperCommandArgument::new)
-                .toArray(PaperCommandArgument[]::new));
+                .toArray(PaperCommandArgument[]::new);
+
+        if (Bukkit.isPrimaryThread()) {
+            this.paperCommand.execute(commandSender, commandArguments);
+            return true;
+        }
+        if (!this.paperCommand.getPlugin().isEnabled()) {
+            return true;
+        }
+        final Runnable task = () -> this.paperCommand.execute(commandSender, commandArguments);
+
+        if (PaperCommandExecutor.FOLIA) {
+            FoliaCommandScheduler.execute(this.paperCommand.getPlugin(), task);
+            return true;
+        }
+        Bukkit.getScheduler().runTask(this.paperCommand.getPlugin(), task);
         return true;
     }
 
